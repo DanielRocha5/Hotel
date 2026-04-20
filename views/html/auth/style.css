@@ -145,7 +145,7 @@ button[type="submit"]:hover {
     filter: brightness(1.1);
 }
 
-/* Links inferiores */
+
 .auth-footer {
     text-align: center;
     margin-top: 2.5rem;
@@ -172,3 +172,14 @@ button[type="submit"]:hover {
     .Contenedor h1 { font-size: 24px; }
 }
 
+.bienvenido-user {
+    font-size: 130px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 50px;
+}
+
+.bienvenido-user span {
+    color: #c4fb6d;
+    font-weight: 600;
+}

@@ -8,22 +8,33 @@
     <link rel="stylesheet" href="views/html/style.css">
 </head>
 <body>
-
+ 
     <nav class="top-nav">
         <div class="nav-container">
             <div class="nav-links">
                 <a href="#inicio">INICIO</a>
                 <a href="#experiencias">EXPERIENCIAS</a>
                 <a href="#habitaciones">SUITES</a>
+ 
+                <?php if(isset($_SESSION['user'])): ?>
+                    <a href="<?php echo SITE_URL; ?>index.php?action=verHabitaciones" class="auth-room">HABITACIONES</a>
+                <?php else: ?>
+                    <a href="<?php echo SITE_URL; ?>index.php?action=getFormRegisterUser" class="auth-room">HABITACIONES</a>
+                <?php endif; ?>
             </div>
             
             <div class="nav-auth">
-                <a href="?action=getFormLoginUser" class="auth-login">INICIAR SESIÓN</a>
-                <a href="?action=getFormRegisterUser" class="auth-register">UNIRSE AHORA</a>
+                <?php if(isset($_SESSION['user'])): ?>
+                    <span class="nav-username">Hola, <?php echo htmlspecialchars($_SESSION['user']['name']); ?></span>
+                    <a href="<?php echo SITE_URL; ?>index.php?action=logoutUser" class="auth-logout">CERRAR SESIÓN</a>
+                <?php else: ?>
+                    <a href="<?php echo SITE_URL; ?>index.php?action=getFormLoginUser" class="auth-login">INICIAR SESIÓN</a>
+                    <a href="<?php echo SITE_URL; ?>index.php?action=getFormRegisterUser" class="auth-register">CREAR CUENTA</a>
+                <?php endif; ?>
             </div>
         </div>
     </nav>
-
+ 
     <header class="hero" id="inicio">
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -32,7 +43,7 @@
                 <h1 class="brand-name">Hotel Verde</h1>
                 <p class="brand-tagline">COLOMBIA · EST. 2026</p>
             </div>
-
+ 
             <div class="hero-message">
                 <p class="message-top">EL ARTE DE NO HACER NADA</p>
                 <h2 class="message-main">Disfruta de una <span>profunda relajación</span> en el corazón de la naturaleza.</h2>
@@ -43,7 +54,7 @@
             </div>
         </div>
     </header>
-
+ 
     <main>
         <section class="intro-section" id="experiencias">
             <div class="container">
@@ -60,7 +71,7 @@
                 </div>
             </div>
         </section>
-
+ 
         <section class="rooms-section" id="habitaciones">
             <div class="container">
                 <div class="section-header">
@@ -85,10 +96,10 @@
             </div>
         </section>
     </main>
-
+ 
     <footer class="main-footer">
         <p>© 2026 HOTEL VERDE · TODOS LOS DERECHOS RESERVADOS POR ADSOSIOS</p>
     </footer>
-
+ 
 </body>
 </html>

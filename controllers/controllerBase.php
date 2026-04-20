@@ -1,7 +1,14 @@
 <?php
-class controllerBase{
+class ControllerBase{
     public function verPaginaDeInicio($pagina){
         include_once $pagina;
+    }
+ 
+    // ✅ NUEVO: Cerrar sesión
+    public function logoutUser(){
+        session_destroy();
+        header('location: '.SITE_URL.'index.php');
+        exit;
     }
  
     public function registerUser($datos){
@@ -18,9 +25,18 @@ class controllerBase{
         }
  
         $user = new User();
-        $existe = $user->validateUser($datos);
-        if($existe > 0){
-            $_SESSION['errors'] = ['general' => '* El Usuario ya existe.'];
+ 
+        $existeEmail = $user->validateUser($datos);
+        if($existeEmail > 0){
+            $_SESSION['errors'] = ['general' => '* El correo ya está registrado.'];
+            $_SESSION['old'] = $datos;
+            header('location: '.SITE_URL.'index.php?action=getFormRegisterUser');
+            exit;
+        }
+ 
+        $existeDoc = $user->validateDocumentNumber($datos);
+        if($existeDoc > 0){
+            $_SESSION['errors'] = ['general' => '* El número de documento ya está registrado.'];
             $_SESSION['old'] = $datos;
             header('location: '.SITE_URL.'index.php?action=getFormRegisterUser');
             exit;
@@ -51,14 +67,15 @@ class controllerBase{
         $errores = [];
  
         if(empty(trim($datos['email'] ?? ''))){
-            $errores['email'] = '* El email es requerido';
+            $errores['email'] = '* El correo es obligatorio.';
         } elseif(!strpos($datos['email'], '@')){
-            $errores['email'] = '* El gmail debe contener @.';
+            $errores['email'] = '* El correo debe contener @.';
         } elseif(!strpos($datos['email'], '.')){
-            $errores['email'] = '* El gmail debe tener un .';
+            $errores['email'] = '* El correo debe contener un punto.';
         }
+ 
         if(empty($datos['password'] ?? '')){
-            $errores['password'] = '* La contraseña es requerida';
+            $errores['password'] = '* La contraseña es requerida.';
         }
  
         if(count($errores) > 0){
@@ -76,7 +93,7 @@ class controllerBase{
             header('location: '.SITE_URL.'index.php');
             exit;
         } else {
-            $_SESSION['errors'] = ['general' => '* Email o contraseña incorrectos.'];
+            $_SESSION['errors'] = ['general' => '* El correo o la contraseña son incorrectos.'];
             $_SESSION['old'] = $datos;
             header('location: '.SITE_URL.'index.php?action=getFormLoginUser');
             exit;
@@ -86,22 +103,53 @@ class controllerBase{
     public function validateData($datos){
         $errores = [];
  
+        if(empty($datos['document_type_id'] ?? '')){
+            $errores['document_type_id'] = '* Selecciona un tipo de documento.';
+        }
+ 
+        if(empty(trim($datos['document_number'] ?? ''))){
+            $errores['document_number'] = '* El número de documento es obligatorio.';
+        } elseif(!ctype_digit($datos['document_number'])){
+            $errores['document_number'] = '* El número de documento solo debe contener dígitos.';
+        }
+ 
         if(empty(trim($datos['name'] ?? ''))){
-            $errores['name'] = '* El nombre es requerido';
+            $errores['name'] = '* El nombre es obligatorio.';
         }
+ 
+        if(empty(trim($datos['last_name'] ?? ''))){
+            $errores['last_name'] = '* El apellido es obligatorio.';
+        }
+ 
         if(empty(trim($datos['email'] ?? ''))){
-            $errores['email'] = '* El email es requerido';
+            $errores['email'] = '* El correo es obligatorio.';
         } elseif(!strpos($datos['email'], '@')){
-            $errores['email'] = '* El gmail debe contener @.';
+            $errores['email'] = '* El correo debe contener @.';
         } elseif(!strpos($datos['email'], '.')){
-            $errores['email'] = '* El gmail debe tener un .';
+            $errores['email'] = '* El correo debe contener un punto.';
         }
-
+ 
         if(empty($datos['password'] ?? '')){
-            $errores['password'] = '* La contraseña es requerida';
-        } elseif(strlen($datos['password']) < 6){
-            $errores['password'] = '* La contraseña debe contener al menos 6 caracteres';
+            $errores['password'] = '* La contraseña es obligatoria.';
+        } else {
+            $pass = $datos['password'];
+            if(strlen($pass) < 6){
+                $errores['password'] = '* La contraseña debe tener al menos 6 caracteres.';
+            } elseif(!preg_match('/[a-z]/', $pass)){
+                $errores['password'] = '* La contraseña debe tener al menos una letra minúscula.';
+            } elseif(!preg_match('/[A-Z]/', $pass)){
+                $errores['password'] = '* La contraseña debe tener al menos una letra mayúscula.';
+            } elseif(!preg_match('/[^a-zA-Z0-9]/', $pass)){
+                $errores['password'] = '* La contraseña debe tener al menos un carácter especial.';
+            }
         }
+ 
+        if(empty($datos['password_verify'] ?? '')){
+            $errores['password_verify'] = '* Debes verificar la contraseña.';
+        } elseif(($datos['password'] ?? '') !== ($datos['password_verify'] ?? '')){
+            $errores['password_verify'] = '* Las contraseñas no coinciden.';
+        }
+ 
         return $errores;
     }
 }
